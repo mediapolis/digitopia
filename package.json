@@ -1,5 +1,9 @@
 {
   "name": "digitopia",
   "description": "responsive framework.",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "repository": {
+    "type":"git",
+    "url": "git://github.com/mediapolis/digitopia.git"
+  }
 }
