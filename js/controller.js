@@ -83,11 +83,15 @@ function GetJQueryPlugin(classname,obj) {
 		this.start = function() {
 			if(this.config.geometry && this.config.geometry.enabled) {
 				this.config.geometry.controller = this;
-				this.element.digitopiaGeometry(this.config.geometry);
+				setTimeout(function() {
+					self.element.digitopiaGeometry(self.config.geometry);
+				},0);
 			}
 			if(this.config.hijax && this.config.hijax.enabled) {
 				this.config.hijax.controller = this;
-				this.element.digitopiaHijax(this.config.hijax);
+				setTimeout(function() {
+					self.element.digitopiaHijax(self.config.hijax);
+				},0);
 			}
 			
 			this.instantiateElements();

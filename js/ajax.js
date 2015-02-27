@@ -46,7 +46,9 @@
 						self.ajaxLayer();
 					}
 				});
-				this.element.digitopiaLazy(this.settings);
+				setTimeout(function() {
+					self.element.digitopiaLazy(self.settings);
+				},0);
 			}
 			else {
 				this.ajaxLayer();

@@ -134,7 +134,9 @@
 				}
 			});
 
-			this.element.digitopiaLazy();
+			setTimeout(function() {
+				self.element.digitopiaLazy();
+			},0);
 		};
 		
 		this.stop = function() {

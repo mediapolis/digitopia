@@ -59,11 +59,15 @@
 		if(this.settings.fillContainer) {
 			++this.following;
 			if(this.settings.fillContainer === 'parent') {
-				this.element.parent().digitopiaContainer()
+				setTimeout(function() {
+					self.element.parent().digitopiaContainer();
+				},0);
 				this.listenTo[this.element.parent().attr('id')] = true;
 			}
 			else {
-				$(this.settings.fillContainer).digitopiaContainer();
+				setTimeout(function() {
+					$(self.settings.fillContainer).digitopiaContainer();
+				},0);
 				this.listenTo[$(this.settings.fillContainer).attr('id')] = true;
 			}
 		}
