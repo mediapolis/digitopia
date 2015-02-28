@@ -161,9 +161,10 @@ function GetJQueryPlugin(classname,obj) {
 
 								// start the object's behavior
 								if(handler.start) { 
+									var element = this;
 									window.setTimeout(function() { 
 										handler.start(); 
-										$('.DigitopiaInstance').trigger('DigitopiaNewInstance',this);
+										$('.DigitopiaInstance').trigger('DigitopiaNewInstance',element);
 									},0);
 								}
 
