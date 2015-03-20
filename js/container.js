@@ -31,13 +31,13 @@
 			followElementHeight: this.element.data('follow-element-height'),
 			fillContainer: this.element.data('fill-container')
 		}, options || {});
-		
+
 		this.active = undefined;
-		
+
 		if(!this.settings.scales.length) {
 			this.active = true;
 		}
-		
+
 		this.origHeight = elem.style.height;
 		this.origWidth = elem.style.width;
 
@@ -47,7 +47,7 @@
 		this.listenTo = {};
 
 		this.following = 0;
-		
+
 		if(this.settings.followElementWidth) {
 			++this.following;
 			this.listenTo[$(this.settings.followElementWidth).attr('id')] = true;
@@ -71,7 +71,7 @@
 				this.listenTo[$(this.settings.fillContainer).attr('id')] = true;
 			}
 		}
-				
+
 		this.start = function() {
 			this.element.on('DigitopiaScaleChanged.' + this.id, function(e, scale) {
 				e.stopPropagation();
@@ -79,7 +79,7 @@
 					self.watchScale(scale);
 				}
 			});
-			
+
 			if(this.following) {
 				for(var id in this.listenTo){
 					//console.log(this.id + ' is listenting to ' + id);
@@ -103,23 +103,23 @@
 
 			this.handleResize();
 		};
-	
+
 		this.stop = function() {
 			this.element.off('DigitopiaScaleChanged.' + this.id);
-			
+
 			if(this.following) {
 				for(var id in this.listenTo){
 					this.element.off('digitopiaContainerDidResize' + id + '.' + this.id);
 				}
 			}
 			else {
-				this.element.off('DigitopiaDidResize.' + this.id); 
+				this.element.off('DigitopiaDidResize.' + this.id);
 			}
 		};
-	
+
 		this.watchScale = function(scale) {
 			var wasActive = this.active;
-			
+
 			if(this.settings.scales.length) {
 				this.active = false;
 				for(var i = 0; i < this.settings.scales.length; i++) {
@@ -131,21 +131,21 @@
 			else {
 				this.active = true;
 			}
-		
+
 			if(!this.active) {
 				this.element.css({
-					'width': this.origWidth ? this.origWidth: "", 
+					'width': this.origWidth ? this.origWidth: "",
 					'height': this.origHeight ? this.origHeight : ""
 				});
 			}
-			
+
 			if(wasActive != this.active) {
 				//console.log(this.id + ' now active? ' + this.active);
 			}
-			
+
 			this.handleResize();
 		};
-	
+
 		this.handleResize = function() {
 			var change = false;
 
@@ -154,10 +154,10 @@
 
 			if(this.active || this.active === undefined) {
 				if(this.settings.followElementWidth) {
-					if(w != $(this.settings.followElementWidth).innerWidth()) { 
-						++change; 
-						w = $(this.settings.followElementWidth).innerWidth();			
-						this.element.innerWidth(w);
+					if(w != $(this.settings.followElementWidth).innerWidth()) {
+						++change;
+						w = $(this.settings.followElementWidth).innerWidth();
+						this.element.outerWidth(w);
 					}
 				}
 
@@ -165,33 +165,33 @@
 					if(h != $(this.settings.followElementHeight).innerHeight()) {
 						++change;
 						var h = $(this.settings.followElementHeight).innerHeight();
-						this.element.innerHeight(h);
+						this.element.outerHeight(h);
 					}
 				}
-			}	
-						
+			}
+
 			if(this.settings.fillContainer) {
 				var container = undefined;
-				
+
 				if(this.settings.fillContainer === 'parent') {
 					container = this.element.parent();
 				}
 				else {
 					container = $(this.settings.fillContainer);
 				}
-				
-				if(w != container.innerWidth()) { 
-					++change; 
-					w = container.innerWidth();			
-					this.element.innerWidth(w);
+
+				if(w != container.innerWidth()) {
+					++change;
+					w = container.innerWidth();
+					this.element.outerWidth(w);
 				}
-				if(h != container.innerHeight()) { 
-					++change; 
-					h = container.innerHeight();			
-					this.element.innerHeight(h);
+				if(h != container.innerHeight()) {
+					++change;
+					h = container.innerHeight();
+					this.element.outerHeight(h);
 				}
-			}		
-				
+			}
+
 			if(change || (w != this.lastWidth) || (h != this.lastHeight)) {
 				//console.log(this.id + ' changed',w,h);
 				this.element.find('.DigitopiaInstance').trigger('digitopiaContainerDidResize');
