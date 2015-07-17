@@ -27,9 +27,9 @@
 
 		this.id = element.id;
 		this.scale = undefined;
-		
+
 		this.loaded = false;
-				
+
 		this.settings = $.extend({
 			enabledScales: $(this.element).data('enabled-scales') ? $(this.element).data('enabled-scales').split(',') : []
 		}, options || {});
@@ -66,11 +66,11 @@
 						self.lazy(force);
 					}
 				});
-				
+
 				this.lazy();
 			}
 		};
-		
+
 		this.stop = function() {
 			this.element.off('DigitopiaScaleChanged.' + this.id);
 			this.element.off('DigitopiaDidScroll.' + this.id);
@@ -91,12 +91,12 @@
 				return true;
 			}
 		};
-		
+
 		this.lazy = function (force) {
 			if(!this.loaded && this.want()) {
 				if(force || ($.inviewport(this.element, { threshold:0 } ) && $(this.element).is(':visible'))) {
 					this.element.removeClass('responsive-loading');
-					this.element.trigger('digitopiaLazyLoad');	
+					this.element.trigger('digitopiaLazyLoad');
 					this.loaded = true;
 				}
 			}
@@ -112,20 +112,20 @@
 		var self = this;
 
 		this.id = element.id;
-		
+
 		this.loaded = false;
-		
+
 		this.scale = undefined;
 		this.loadedScale = undefined;
 
 		this.start = function() {
-			$(this.element).attr('src','/digitopia/images/lazy.gif');
-			
+			//$(this.element).attr('src','/digitopia/images/lazy.gif');
+
 			this.element.on('digitopiaLazyLoad.'+ this.id, function(e,force) {
 				e.stopPropagation();
 				self.lazy(force);
 			});
-			
+
 			this.element.on('DigitopiaScaleChanged.' + this.id, function(e,scale) {
 				e.stopPropagation();
 				self.scale = scale;
@@ -138,7 +138,7 @@
 				self.element.digitopiaLazy();
 			},0);
 		};
-		
+
 		this.stop = function() {
 			this.element.off('digitopiaLazyLoad.' + this.id);
 			this.element.off('DigitopiaScaleChanged.' + this.id);
@@ -149,14 +149,14 @@
 				this.load();
 			}
 		};
-		
+
 		this.load = function(force) {
 			var src = $(this.element).data('lazy-src');
-			
+
 			if($(this.element).data('lazy-'+this.scale+'-src')) {
 				src = $(this.element).data('lazy-'+this.scale+'-src');
 			}
-			
+
 			if($(self.element).attr('src') != src) {
 				//flash('lazy ' + self.id + ' loading: ' + src + ' for scale ' + self.scale);
 				$(self.element).css({opacity:.5}).attr('src', src).load(function() {
@@ -169,9 +169,9 @@
 						}
 					}
 				}).error(function() {
-					$(this).attr('src','/digitopia/images/lazy.gif');
+					//$(this).attr('src','/digitopia/images/lazy.gif');
 				});
-			}		
+			}
 			this.loaded = true;
 			this.loadedScale = this.scale;
 		};
