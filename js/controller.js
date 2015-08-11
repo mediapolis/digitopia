@@ -95,7 +95,7 @@ function GetJQueryPlugin(classname,obj) {
 			}
 
 			this.element.lazyInstantiate();
-			
+
 			this.instantiateElements();
 
 			$(window).unload(function() {
@@ -105,10 +105,12 @@ function GetJQueryPlugin(classname,obj) {
 			self.scrollTimer = undefined;
 
 			$(window).scroll(function() {
-				if(self.scrollTimer) {
-			    	clearTimeout(self.scrollTimer);
-			    }
-				self.scrollTimer = setTimeout(function() { self.scrollTimer = undefined; $('.DigitopiaInstance').trigger('DigitopiaDidScroll'); }, 100);
+				if(!self.scrollTimer) {
+					self.scrollTimer = setTimeout(function() {
+						self.scrollTimer = undefined;
+						$('.DigitopiaInstance').trigger('DigitopiaDidScroll');
+					}, 250);
+				}
 			});
 
 			self.resizeTimer = undefined;
