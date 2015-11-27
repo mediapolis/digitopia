@@ -202,6 +202,9 @@
 					}
 					$('#' + id).empty().append(chunk.children());
 				});
+
+				var title = $(html).filter("title").text();
+				document.title = title;
 	
 				this.contentMerged();
 			}
