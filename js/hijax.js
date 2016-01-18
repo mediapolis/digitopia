@@ -19,78 +19,85 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-(function($){
+(function ($) {
 	function getPath(location) {
 		var path = location.pathname + location.search;
 		return path;
 	};
-	
-	var digitopiaHijax = function(element, options){
+
+	var digitopiaHijax = function (element, options) {
 		this.element = $(element);
 		var self = this;
 		this.currentPath = undefined;
-		
+
 		this.startTime = undefined;
-		
+
 		this.settings = $.extend({
 			// process first page (normally only used for paged with content handlers)
 			processOriginalPath: false,
-			
+
 			// use location hash scheme
 			locationHash: false,
-			
+
 			// use html5 history scheme
 			popState: Modernizr.history,
-			
+
 			// don't hijax links like mailto or script
 			excludeRegex: new RegExp('^(\/\/|http|javascript|mailto|#)'),
-			
+
 			// array of content handlers
 			contentHandlers: [],
-			
+
 			// minimum time to delay merging content (for page transition animation)
 			debounce: undefined,
-			
+
 			disableScrollAnimation: false,
-			
+
 			scrollTop: 0
 		}, options || {});
 
-		if(!this.settings.processOriginalPath) {
+		if (!this.settings.processOriginalPath) {
 			this.currentPath = getPath(document.location);
 		}
-		
-		this.start = function() {
+
+		this.start = function () {
 			this.hijaxLinks(this.element);
-			
-			if(this.settings.locationHash) {			
+
+			if (this.settings.locationHash) {
 				$(window).bind('hashchange.hijax', function () {
 					self.watchLocationHash();
 				});
 				this.watchLocationHash();
 			}
-			
-			if(this.settings.popState) {
-				$(window).bind('popstate.hijax', function(event){
+
+			if (this.settings.popState) {
+				$(window).bind('popstate.hijax', function (event) {
 					self.watchPopState(event);
 				});
 				self.watchPopState();
 			}
 
-			$(this.element).on('DigitopiaLoadPage', function(e,href) {
+			$(this.element).on('DigitopiaReloadPage', function (e, href) {
 				e.stopPropagation();
-				if(e.target === this) {
-					if(!self.settings.popState && !self.settings.locationHash) {
+				if (e.target === this) {
+					self.hijaxLoad(self.currentPath, self.currentPath);
+				}
+			});
+
+			$(this.element).on('DigitopiaLoadPage', function (e, href) {
+				e.stopPropagation();
+				if (e.target === this) {
+					if (!self.settings.popState && !self.settings.locationHash) {
 						document.location.href = href;
 					}
 					else {
-						if(href && !self.settings.excludeRegex.exec(href)) {
-							if(getPath(document.location) !== href) {
-								if(self.settings.locationHash) {
+						if (href && !self.settings.excludeRegex.exec(href)) {
+							if (getPath(document.location) !== href) {
+								if (self.settings.locationHash) {
 									self.setLocationHash('hijax' + href);
 								}
 								else {
-									if(self.settings.popState) {
+									if (self.settings.popState) {
 										history.pushState(null, null, href);
 										self.watchPopState();
 									}
@@ -101,35 +108,38 @@
 				}
 			});
 		};
-		
-		this.stop = function() {
+
+		this.stop = function () {
 			$('a').unbind('click.hijax');
-			if(this.settings.popState) {
+			if (this.settings.popState) {
 				$(window).unbind('popstate.hijax');
 			}
 			$(this.element).off('DigitopiaLoadPage');
+			$(this.element).off('DigitopiaReloadPage');
 		};
 
-		this.hijaxLoad = function(path,oldPath) {			
+		this.hijaxLoad = function (path, oldPath) {
 			var done = false;
 
-			if(typeof(rewriteUrls) !== 'undefined') {
+			if (typeof (rewriteUrls) !== 'undefined') {
 				path = rewriteUrls(path);
 			}
 
-			$('.DigitopiaInstance').trigger('DigitopiaWillLoadNewPage',[oldPath,path]);
+			$('.DigitopiaInstance').trigger('DigitopiaWillLoadNewPage', [oldPath,
+				path
+			]);
 
-			if(this.settings.debounce) {
+			if (this.settings.debounce) {
 				this.startTime = new Date();
 			}
-			
-			if(this.settings.contentHandlers.length) {
-				for(var i = 0; i < this.settings.contentHandlers.length; i++) {
+
+			if (this.settings.contentHandlers.length) {
+				for (var i = 0; i < this.settings.contentHandlers.length; i++) {
 					var match = path.match(this.settings.contentHandlers[i].path);
-					if(match) {
+					if (match) {
 						var content = undefined;
-						
-						if(this.settings.contentHandlers[i].content) {
+
+						if (this.settings.contentHandlers[i].content) {
 							content = this.settings.contentHandlers[i].content;
 						}
 						else {
@@ -137,21 +147,21 @@
 						}
 
 						self.mergeContent(content);
-						done = true;				
+						done = true;
 					}
 				}
 			}
-			
-			if(!done) {
+
+			if (!done) {
 				$.ajax({
 					type: "GET",
 					url: path,
 					dataType: 'html',
-					success: function(html) {
+					success: function (html) {
 						self.mergeContent(html);
 					},
 					error: function (request, status, error) {
-						if(request.responseText) {
+						if (request.responseText) {
 							alert('could not load page.');
 						}
 					}
@@ -159,32 +169,34 @@
 			}
 		};
 
-		this.mergeContent = function(html) {
+		this.mergeContent = function (html) {
 
 			var elapsed = 0;
-			if(this.settings.debounce) {
+			if (this.settings.debounce) {
 				var now = new Date();
 				elapsed = now.getTime() - this.startTime.getTime();
 			}
-			
-			if(this.settings.debounce && elapsed < self.settings.debounce) {
-				setTimeout(function(instance,content) {
-					return function() { 
+
+			if (this.settings.debounce && elapsed < self.settings.debounce) {
+				setTimeout(function (instance, content) {
+					return function () {
 						instance.mergeContent(content); // reveal the new page
 					}
-				}(this,html), self.settings.debounce - elapsed);
+				}(this, html), self.settings.debounce - elapsed);
 			}
 			else {
-				if(this.settings.disableScrollAnimation) {
-					$("html, body").scrollTop( this.settings.scrollTop );
+				if (this.settings.disableScrollAnimation) {
+					$("html, body").scrollTop(this.settings.scrollTop);
 				}
 				else {
-					$("html, body").animate({scrollTop:this.settings.scrollTop}, '250');
+					$("html, body").animate({
+						scrollTop: this.settings.scrollTop
+					}, '250');
 				}
-				
+
 				var containers = $("[data-hijax]");
-					
-				containers.each(function() {
+
+				containers.each(function () {
 					var id = this.id;
 					$('#' + id).find('.DigitopiaInstance').trigger('DigitopiaStop');
 					$('#' + id).trigger('DigitopiaStop');
@@ -193,77 +205,79 @@
 				var doc = html.split(/(<body[^>]*>|<\/body>)/ig);
 				var docBody = $(doc[2]);
 
-				containers.each(function() {
-					var id = this.id;				
+				containers.each(function () {
+					var id = this.id;
 					var chunk = '';
-					chunk = $(docBody).find('#'+id);
-					if(!chunk || chunk.length === 0) {
-						chunk = $(docBody).filter('#'+id);
+					chunk = $(docBody).find('#' + id);
+					if (!chunk || chunk.length === 0) {
+						chunk = $(docBody).filter('#' + id);
 					}
 					$('#' + id).empty().append(chunk.children());
 				});
 
 				var title = $(html).filter("title").text();
 				document.title = title;
-	
+
 				this.contentMerged();
 			}
 		};
 
-		this.contentMerged = function() {
-		
+		this.contentMerged = function () {
+
 			var containers = $("[data-hijax]");
-			
-			containers.each(function() {
+
+			containers.each(function () {
 				var id = this.id;
 				self.hijaxLinks('#' + id);
 			});
-			
+
 			$('.DigitopiaInstance').trigger('DigitopiaInstantiate');
 
-			$('.DigitopiaInstance').trigger('DigitopiaDidLoadNewPage',getPath(document.location));
-		};		
-		
-		this.hijaxLinks = function(node) {
+			$('.DigitopiaInstance').trigger('DigitopiaDidLoadNewPage', getPath(
+				document.location));
+		};
+
+		this.hijaxLinks = function (node) {
 			$(node).find('a').unbind('click.hijax');
-			$(node).find('a').each(function() {
+			$(node).find('a').each(function () {
 				var href = $(this).attr('href');
-				if(href && !$(this).attr('target') && !$(this).data('no-hijax') && !self.settings.excludeRegex.exec(href)) {		
-					$(this).bind('click.hijax',function(e) {
+				if (href && !$(this).attr('target') && !$(this).data('no-hijax') && !
+					self.settings.excludeRegex.exec(href)) {
+					$(this).bind('click.hijax', function (e) {
 						e.preventDefault();
-						$('body').trigger('DigitopiaLoadPage',href);
+						$('body').trigger('DigitopiaLoadPage', href);
 					});
 				}
 			});
 		}
 
-		this.watchPopState = function(event) {
-			if(this.currentPath || (this.currentPath === undefined && this.settings.processOriginalPath)) {
-				if(getPath(document.location) != this.currentPath) {
+		this.watchPopState = function (event) {
+			if (this.currentPath || (this.currentPath === undefined && this.settings.processOriginalPath)) {
+				if (getPath(document.location) != this.currentPath) {
 					var oldPath = this.currentPath;
 					this.currentPath = getPath(document.location);
-					this.hijaxLoad(this.currentPath,oldPath);
+					this.hijaxLoad(this.currentPath, oldPath);
 				}
 			}
 		}
 
-		this.setLocationHash = function(params) {
-			location.hash = params;	
+		this.setLocationHash = function (params) {
+			location.hash = params;
 		}
 
-		this.watchLocationHash = function() {
-			if(location.hash != this.currentPath) {
-				var pathArray = location.hash.split('/'); 
-				if(pathArray[0] == '#hijax') {
+		this.watchLocationHash = function () {
+			if (location.hash != this.currentPath) {
+				var pathArray = location.hash.split('/');
+				if (pathArray[0] == '#hijax') {
 					var oldPath = this.currentPath;
-					pathArray.splice(0,1);
+					pathArray.splice(0, 1);
 					this.currentPath = '/' + pathArray.join('/');
-					this.hijaxLoad(this.currentPath,oldPath);
+					this.hijaxLoad(this.currentPath, oldPath);
 				}
 			}
 		}
 	};
 
-	$.fn.digitopiaHijax = GetJQueryPlugin('digitopiaHijax',digitopiaHijax);
+	$.fn.digitopiaHijax = GetJQueryPlugin('digitopiaHijax', digitopiaHijax);
 
 })(jQuery);
