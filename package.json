@@ -3,7 +3,16 @@
   "description": "responsive framework.",
   "version": "1.0.0",
   "repository": {
-    "type":"git",
+    "type": "git",
     "url": "git://github.com/mediapolis/digitopia.git"
+  },
+  "dependencies": {
+    "grunt": "*",
+    "grunt-cli": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-cssmin": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "*"
   }
 }
