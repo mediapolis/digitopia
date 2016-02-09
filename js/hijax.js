@@ -53,7 +53,9 @@
 
 			disableScrollAnimation: false,
 
-			scrollTop: 0
+			scrollTop: 0,
+
+			nextScrollTop: 0
 		}, options || {});
 
 		if (!this.settings.processOriginalPath) {
@@ -80,6 +82,7 @@
 			$(this.element).on('DigitopiaReloadPage', function (e, href) {
 				e.stopPropagation();
 				if (e.target === this) {
+					self.settings.nextScrollTop = $(window).scrollTop();
 					self.hijaxLoad(self.currentPath, self.currentPath);
 				}
 			});
@@ -185,12 +188,14 @@
 				}(this, html), self.settings.debounce - elapsed);
 			}
 			else {
+				var top = this.settings.nextScrollTop;
+
 				if (this.settings.disableScrollAnimation) {
-					$("html, body").scrollTop(this.settings.scrollTop);
+					$("html, body").scrollTop(top);
 				}
 				else {
 					$("html, body").animate({
-						scrollTop: this.settings.scrollTop
+						scrollTop: top
 					}, '250');
 				}
 
@@ -256,6 +261,7 @@
 				if (getPath(document.location) != this.currentPath) {
 					var oldPath = this.currentPath;
 					this.currentPath = getPath(document.location);
+					this.settings.nextScrollTop = this.settings.scrollTop;
 					this.hijaxLoad(this.currentPath, oldPath);
 				}
 			}
@@ -272,6 +278,7 @@
 					var oldPath = this.currentPath;
 					pathArray.splice(0, 1);
 					this.currentPath = '/' + pathArray.join('/');
+					this.settings.nextScrollTop = this.settings.scrollTop;
 					this.hijaxLoad(this.currentPath, oldPath);
 				}
 			}
