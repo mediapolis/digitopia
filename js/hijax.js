@@ -173,7 +173,7 @@
 		};
 
 		this.mergeContent = function (html) {
-
+			$('.DigitopiaInstance').trigger('DigitopiaDidLoadNewPageContent');
 			var elapsed = 0;
 			if (this.settings.debounce) {
 				var now = new Date();
