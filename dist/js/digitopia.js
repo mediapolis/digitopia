@@ -791,14 +791,21 @@ function GetJQueryPlugin(classname,obj) {
 
 			if($(self.element).attr('src') != src) {
 				//flash('lazy ' + self.id + ' loading: ' + src + ' for scale ' + self.scale);
-				$(self.element).css({opacity:.5}).attr('src', src).load(function() {
+				$(self.element).css({opacity:0}).attr('src', src).load(function() {
 					if (this.complete && typeof this.naturalWidth !== "undefined" && this.naturalWidth !== 0) {
 						$(this).data('width', this.naturalWidth);
 						$(this).data('height', this.naturalHeight);
-						$(this).animate({opacity:1},250);
 						if($(this).data('inViewPort')) {
 							$(this).data('inViewPort').fitElements();
 						}
+						
+						// next tick - do this after fitElements renders
+						var instance = this;
+						setTimeout(function () {
+							$(instance).animate({
+								opacity: 1
+							}, 250);
+						}, 0);
 					}
 				}).error(function() {
 					//$(this).attr('src','/digitopia/images/lazy.gif');
@@ -1247,7 +1254,9 @@ function GetJQueryPlugin(classname,obj) {
 
 			disableScrollAnimation: false,
 
-			scrollTop: 0
+			scrollTop: 0,
+
+			nextScrollTop: 0
 		}, options || {});
 
 		if (!this.settings.processOriginalPath) {
@@ -1274,6 +1283,7 @@ function GetJQueryPlugin(classname,obj) {
 			$(this.element).on('DigitopiaReloadPage', function (e, href) {
 				e.stopPropagation();
 				if (e.target === this) {
+					self.settings.nextScrollTop = $(window).scrollTop();
 					self.hijaxLoad(self.currentPath, self.currentPath);
 				}
 			});
@@ -1364,7 +1374,7 @@ function GetJQueryPlugin(classname,obj) {
 		};
 
 		this.mergeContent = function (html) {
-
+			$('.DigitopiaInstance').trigger('DigitopiaDidLoadNewPageContent');
 			var elapsed = 0;
 			if (this.settings.debounce) {
 				var now = new Date();
@@ -1379,12 +1389,14 @@ function GetJQueryPlugin(classname,obj) {
 				}(this, html), self.settings.debounce - elapsed);
 			}
 			else {
+				var top = this.settings.nextScrollTop;
+
 				if (this.settings.disableScrollAnimation) {
-					$("html, body").scrollTop(this.settings.scrollTop);
+					$("html, body").scrollTop(top);
 				}
 				else {
 					$("html, body").animate({
-						scrollTop: this.settings.scrollTop
+						scrollTop: top
 					}, '250');
 				}
 
@@ -1450,6 +1462,7 @@ function GetJQueryPlugin(classname,obj) {
 				if (getPath(document.location) != this.currentPath) {
 					var oldPath = this.currentPath;
 					this.currentPath = getPath(document.location);
+					this.settings.nextScrollTop = this.settings.scrollTop;
 					this.hijaxLoad(this.currentPath, oldPath);
 				}
 			}
@@ -1466,6 +1479,7 @@ function GetJQueryPlugin(classname,obj) {
 					var oldPath = this.currentPath;
 					pathArray.splice(0, 1);
 					this.currentPath = '/' + pathArray.join('/');
+					this.settings.nextScrollTop = this.settings.scrollTop;
 					this.hijaxLoad(this.currentPath, oldPath);
 				}
 			}
