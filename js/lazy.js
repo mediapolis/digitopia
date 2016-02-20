@@ -159,14 +159,21 @@
 
 			if($(self.element).attr('src') != src) {
 				//flash('lazy ' + self.id + ' loading: ' + src + ' for scale ' + self.scale);
-				$(self.element).css({opacity:.5}).attr('src', src).load(function() {
+				$(self.element).css({opacity:0}).attr('src', src).load(function() {
 					if (this.complete && typeof this.naturalWidth !== "undefined" && this.naturalWidth !== 0) {
 						$(this).data('width', this.naturalWidth);
 						$(this).data('height', this.naturalHeight);
-						$(this).animate({opacity:1},250);
 						if($(this).data('inViewPort')) {
 							$(this).data('inViewPort').fitElements();
 						}
+						
+						// next tick - do this after fitElements renders
+						var instance = this;
+						setTimeout(function () {
+							$(instance).animate({
+								opacity: 1
+							}, 250);
+						}, 0);
 					}
 				}).error(function() {
 					//$(this).attr('src','/digitopia/images/lazy.gif');
