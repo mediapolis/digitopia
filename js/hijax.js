@@ -95,17 +95,17 @@
 					}
 					else {
 						if (href && !self.settings.excludeRegex.exec(href)) {
-							if (getPath(document.location) !== href) {
-								if (self.settings.locationHash) {
-									self.setLocationHash('hijax' + href);
-								}
-								else {
-									if (self.settings.popState) {
-										history.pushState(null, null, href);
-										self.watchPopState();
-									}
+							//if (getPath(document.location) !== href) {
+							if (self.settings.locationHash) {
+								self.setLocationHash('hijax' + href);
+							}
+							else {
+								if (self.settings.popState) {
+									history.pushState(null, null, href);
+									self.watchPopState();
 								}
 							}
+							//}
 						}
 					}
 				}
@@ -258,12 +258,12 @@
 
 		this.watchPopState = function (event) {
 			if (this.currentPath || (this.currentPath === undefined && this.settings.processOriginalPath)) {
-				if (getPath(document.location) != this.currentPath) {
-					var oldPath = this.currentPath;
-					this.currentPath = getPath(document.location);
-					this.settings.nextScrollTop = this.settings.scrollTop;
-					this.hijaxLoad(this.currentPath, oldPath);
-				}
+				//if (getPath(document.location) != this.currentPath) {
+				var oldPath = this.currentPath;
+				this.currentPath = getPath(document.location);
+				this.settings.nextScrollTop = this.settings.scrollTop;
+				this.hijaxLoad(this.currentPath, oldPath);
+				//}
 			}
 		}
 
