@@ -258,12 +258,12 @@
 
 		this.watchPopState = function (event) {
 			if (this.currentPath || (this.currentPath === undefined && this.settings.processOriginalPath)) {
-				//if (getPath(document.location) != this.currentPath) {
-				var oldPath = this.currentPath;
-				this.currentPath = getPath(document.location);
-				this.settings.nextScrollTop = this.settings.scrollTop;
-				this.hijaxLoad(this.currentPath, oldPath);
-				//}
+				if (getPath(document.location) != this.currentPath) {
+					var oldPath = this.currentPath;
+					this.currentPath = getPath(document.location);
+					this.settings.nextScrollTop = this.settings.scrollTop;
+					this.hijaxLoad(this.currentPath, oldPath);
+				}
 			}
 		}
 
