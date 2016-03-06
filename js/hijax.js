@@ -160,8 +160,23 @@
 					type: "GET",
 					url: path,
 					dataType: 'html',
-					success: function (html) {
-						self.mergeContent(html);
+					headers: {
+						'x-digitopia-hijax': 'true'
+					},
+					success: function (html, status, xhr) {
+						if (xhr.getResponseHeader('x-digitopia-hijax-location')) {
+							var location = xhr.getResponseHeader('x-digitopia-hijax-location');
+							if (self.settings.popState) {
+								history.pushState(null, null, location);
+								self.watchPopState();
+							}
+							else {
+								document.location.href = location;
+							}
+						}
+						else {
+							self.mergeContent(html);
+						}
 					},
 					error: function (request, status, error) {
 						if (request.responseText) {
