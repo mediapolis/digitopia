@@ -19,8 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-(function($){
-	var digitopiaLazy = function(element, options){
+(function ($) {
+	var digitopiaLazy = function (element, options) {
 		this.element = $(element);
 
 		var self = this;
@@ -34,35 +34,35 @@
 			enabledScales: $(this.element).data('enabled-scales') ? $(this.element).data('enabled-scales').split(',') : []
 		}, options || {});
 
-		this.start = function() {
-			if(!this.loaded) {
+		this.start = function () {
+			if (!this.loaded) {
 				$(this.element).addClass('responsive-loading');
 
-				this.element.on('DigitopiaScaleChanged.' + this.id, function(e, scale) {
+				this.element.on('DigitopiaScaleChanged.' + this.id, function (e, scale) {
 					e.stopPropagation();
-					if(e.target === this) {
+					if (e.target === this) {
 						self.scale = scale;
 						self.lazy();
 					}
 				});
 
-				this.element.on('DigitopiaDidScroll.' + this.id, function(e, scale) {
+				this.element.on('DigitopiaDidScroll.' + this.id, function (e, scale) {
 					e.stopPropagation();
-					if(e.target === this) {
+					if (e.target === this) {
 						self.lazy();
 					}
 				});
 
-				this.element.on('DigitopiaDidResize.' + this.id, function(e, scale) {
+				this.element.on('DigitopiaDidResize.' + this.id, function (e, scale) {
 					e.stopPropagation();
-					if(e.target === this) {
+					if (e.target === this) {
 						self.lazy();
 					}
 				});
 
-				this.element.on('DigitopiaLazy.' + this.id, function(e,force) {
+				this.element.on('DigitopiaLazy.' + this.id, function (e, force) {
 					e.stopPropagation();
-					if(e.target === this) {
+					if (e.target === this) {
 						self.lazy(force);
 					}
 				});
@@ -71,16 +71,16 @@
 			}
 		};
 
-		this.stop = function() {
+		this.stop = function () {
 			this.element.off('DigitopiaScaleChanged.' + this.id);
 			this.element.off('DigitopiaDidScroll.' + this.id);
 			this.element.off('DigitopiaDidResize.' + this.id);
 			this.element.off('DigitopiaLazy.' + this.id);
 		};
 
-		this.want = function() {
-			if(this.settings.enabledScales.length) {
-				if(this.scale) {
+		this.want = function () {
+			if (this.settings.enabledScales.length) {
+				if (this.scale) {
 					return this.settings.enabledScales.indexOf(this.scale) !== -1;
 				}
 				else {
@@ -93,8 +93,10 @@
 		};
 
 		this.lazy = function (force) {
-			if(!this.loaded && this.want()) {
-				if(force || ($.inviewport(this.element, { threshold:0 } ) && $(this.element).is(':visible'))) {
+			if (!this.loaded && this.want()) {
+				if (force || ($.inviewport(this.element, {
+						threshold: 0
+					}) && $(this.element).is(':visible'))) {
 					this.element.removeClass('responsive-loading');
 					this.element.trigger('digitopiaLazyLoad');
 					this.loaded = true;
@@ -106,7 +108,7 @@
 
 	};
 
-	var digitopiaLazyImg = function(element, options){
+	var digitopiaLazyImg = function (element, options) {
 		this.element = $(element);
 
 		var self = this;
@@ -118,55 +120,57 @@
 		this.scale = undefined;
 		this.loadedScale = undefined;
 
-		this.start = function() {
+		this.start = function () {
 			//$(this.element).attr('src','/digitopia/images/lazy.gif');
 
-			this.element.on('digitopiaLazyLoad.'+ this.id, function(e,force) {
+			this.element.on('digitopiaLazyLoad.' + this.id, function (e, force) {
 				e.stopPropagation();
 				self.lazy(force);
 			});
 
-			this.element.on('DigitopiaScaleChanged.' + this.id, function(e,scale) {
+			this.element.on('DigitopiaScaleChanged.' + this.id, function (e, scale) {
 				e.stopPropagation();
 				self.scale = scale;
-				if(self.loaded && self.loadedScale != self.scale) {
+				if (self.loaded && self.loadedScale != self.scale) {
 					self.load();
 				}
 			});
 
-			setTimeout(function() {
+			setTimeout(function () {
 				self.element.digitopiaLazy();
-			},0);
+			}, 0);
 		};
 
-		this.stop = function() {
+		this.stop = function () {
 			this.element.off('digitopiaLazyLoad.' + this.id);
 			this.element.off('DigitopiaScaleChanged.' + this.id);
 		};
 
 		this.lazy = function (force) {
-			if(!this.loaded) {
+			if (!this.loaded) {
 				this.load();
 			}
 		};
 
-		this.load = function(force) {
+		this.load = function (force) {
 			var src = $(this.element).data('lazy-src');
 
-			if($(this.element).data('lazy-'+this.scale+'-src')) {
-				src = $(this.element).data('lazy-'+this.scale+'-src');
+			if ($(this.element).data('lazy-' + this.scale + '-src')) {
+				src = $(this.element).data('lazy-' + this.scale + '-src');
 			}
 
-			if($(self.element).attr('src') != src) {
+			if ($(self.element).attr('src') != src) {
 				//flash('lazy ' + self.id + ' loading: ' + src + ' for scale ' + self.scale);
-				$(self.element).css({opacity:0}).attr('src', src).load(function() {
+				$(self.element).css({
+					opacity: 0
+				}).attr('src', src).on('load', function () {
 					if (this.complete && typeof this.naturalWidth !== "undefined" && this.naturalWidth !== 0) {
 						$(this).data('width', this.naturalWidth);
 						$(this).data('height', this.naturalHeight);
-						if($(this).data('inViewPort')) {
+						if ($(this).data('inViewPort')) {
 							$(this).data('inViewPort').fitElements();
 						}
-						
+
 						// next tick - do this after fitElements renders
 						var instance = this;
 						setTimeout(function () {
@@ -175,8 +179,6 @@
 							}, 250);
 						}, 0);
 					}
-				}).error(function() {
-					//$(this).attr('src','/digitopia/images/lazy.gif');
 				});
 			}
 			this.loaded = true;
@@ -184,7 +186,7 @@
 		};
 	};
 
-	$.fn.digitopiaLazy = GetJQueryPlugin('digitopiaLazy',digitopiaLazy);
-	$.fn.digitopiaLazyImg = GetJQueryPlugin('digitopiaLazyImg',digitopiaLazyImg);
+	$.fn.digitopiaLazy = GetJQueryPlugin('digitopiaLazy', digitopiaLazy);
+	$.fn.digitopiaLazyImg = GetJQueryPlugin('digitopiaLazyImg', digitopiaLazyImg);
 
 })(jQuery);

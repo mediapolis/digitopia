@@ -78,7 +78,7 @@ module.exports = function (grunt) {
 		},
 		watch: {
 			files: allFiles,
-			tasks: ['run', 'less', 'stylus', 'copy', 'concat']
+			tasks: ['copy', 'concat', 'uglify', 'cssmin']
 		}
 	});
 
@@ -98,6 +98,8 @@ module.exports = function (grunt) {
 	grunt.registerTask('devel', [
 		'copy',
 		'concat',
+		'uglify',
+		'cssmin',
 		'watch'
 	]);
 };
