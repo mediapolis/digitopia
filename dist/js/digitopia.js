@@ -30,34 +30,34 @@
 var gResponsiveUniqueId = 0;
 var gResponsiveFlashEvents = true;
 
-function GetJQueryPlugin(classname,obj) {
-	return function(options){
-		return this.each(function(){
+function GetJQueryPlugin(classname, obj) {
+	return function (options) {
+		return this.each(function () {
 			var element = $(this);
-			if(!this.id) { // self assigned id (so $.off works when events are namespaced by id)
+			if (!this.id) { // self assigned id (so $.off works when events are namespaced by id)
 				this.id = 'DiGiToPiA-' + ++gResponsiveUniqueId;
 			}
-			if(!element.data(classname)) {
+			if (!element.data(classname)) {
 				element.addClass('DigitopiaInstance');
 				try {
-					var instance =  new obj(this,options);
+					var instance = new obj(this, options);
 					element.data(classname, instance);
-					if(instance.stop) {
-						element.on('DigitopiaStop', function(event) {
+					if (instance.stop) {
+						element.on('DigitopiaStop', function (event) {
 							event.stopPropagation();
-							if(event.target === this) {
+							if (event.target === this) {
 								instance.stop();
 							}
 						});
 					}
-					if(instance.start) {
-						window.setTimeout(function() {
+					if (instance.start) {
+						window.setTimeout(function () {
 							instance.start();
-							$('.DigitopiaInstance').trigger('DigitopiaNewInstance',element);
-						},0);
+							$('.DigitopiaInstance').trigger('DigitopiaNewInstance', element);
+						}, 0);
 					}
 				}
-				catch(err) {
+				catch (err) {
 					alert('Could not initialize element:' + this.id + ' jsclass:' + classname + ' error:' + err);
 				}
 			}
@@ -65,8 +65,8 @@ function GetJQueryPlugin(classname,obj) {
 	}
 }
 
-(function($){
-	var digitopiaController = function(element, options){
+(function ($) {
+	var digitopiaController = function (element, options) {
 		this.element = $(element);
 
 		var self = this;
@@ -80,33 +80,33 @@ function GetJQueryPlugin(classname,obj) {
 			coverResize: false
 		}, options || {});
 
-		this.start = function() {
-			if(this.config.geometry && this.config.geometry.enabled) {
+		this.start = function () {
+			if (this.config.geometry && this.config.geometry.enabled) {
 				this.config.geometry.controller = this;
-				setTimeout(function() {
+				setTimeout(function () {
 					self.element.digitopiaGeometry(self.config.geometry);
-				},0);
+				}, 0);
 			}
-			if(this.config.hijax && this.config.hijax.enabled) {
+			if (this.config.hijax && this.config.hijax.enabled) {
 				this.config.hijax.controller = this;
-				setTimeout(function() {
+				setTimeout(function () {
 					self.element.digitopiaHijax(self.config.hijax);
-				},0);
+				}, 0);
 			}
 
 			this.element.lazyInstantiate();
 
 			this.instantiateElements();
 
-			$(window).unload(function() {
-				$('.DigitopiaInstance').trigger('DigitopiaStart');
-			});
+			// $(window).unload(function() {
+			// 	$('.DigitopiaInstance').trigger('DigitopiaStart');
+			// });
 
 			self.scrollTimer = undefined;
 
-			$(window).scroll(function() {
-				if(!self.scrollTimer) {
-					self.scrollTimer = setTimeout(function() {
+			$(window).scroll(function () {
+				if (!self.scrollTimer) {
+					self.scrollTimer = setTimeout(function () {
 						self.scrollTimer = undefined;
 						$('.DigitopiaInstance').trigger('DigitopiaDidScroll');
 					}, 250);
@@ -117,43 +117,46 @@ function GetJQueryPlugin(classname,obj) {
 
 			$('body').outerWidth($(window).innerWidth());
 
-			$(window).resize(function() {
-				if(self.resizeTimer) {
-			    	clearTimeout(self.resizeTimer);
-			    }
-			    else {
-			    	//console.log('start ',$(window).width());
-    				if(self.config.coverResize) {
-			    		$('body').css({'opacity': 0.3});
-			    	}
-			    }
-    			self.resizeTimer = setTimeout(function() {
-			    	//console.log('end ',$(window).width());
-			    	$('body').outerWidth($(window).innerWidth());
-    				self.resizeTimer = undefined;
-    				$('.DigitopiaInstance').trigger('DigitopiaDidResize');
-    				if(self.config.coverResize) {
-    					$('body').css({'opacity': 1});
-    				}
-    			}, 100);
+			$(window).resize(function () {
+				if (self.resizeTimer) {
+					clearTimeout(self.resizeTimer);
+				}
+				else {
+					//console.log('start ',$(window).width());
+					if (self.config.coverResize) {
+						$('body').css({
+							'opacity': 0.3
+						});
+					}
+				}
+				self.resizeTimer = setTimeout(function () {
+					//console.log('end ',$(window).width());
+					$('body').outerWidth($(window).innerWidth());
+					self.resizeTimer = undefined;
+					$('.DigitopiaInstance').trigger('DigitopiaDidResize');
+					if (self.config.coverResize) {
+						$('body').css({
+							'opacity': 1
+						});
+					}
+				}, 100);
 			});
 
 		};
 
-		this.stop = function() {
-		};
+		this.stop = function () {};
 
-		this.instantiateElements = function() {
+		this.instantiateElements = function () {
 			var didInstantiate = false;
-			$("*[data-jsclass]").each( function () {
+			$("*[data-jsclass]").each(function () {
 				var classnames = $(this).data('jsclass').split(',');
-				for(var i = 0; i < classnames.length; i++) {
+				for (var i = 0; i < classnames.length; i++) {
 					var classname = classnames[i];
-					if(!$(this).data(classname)) {
+					if (!$(this).data(classname)) {
 						didInstantiate = true;
 						var handler = null;
 						try {
-							if($(this)[classname]) { // try jquery plugin method first
+							if ($(this)[classname]) { // try jquery plugin method first
 								$(this)[classname]();
 							}
 							else {
@@ -161,37 +164,37 @@ function GetJQueryPlugin(classname,obj) {
 								handler = new window[classname](this);
 
 								// cache a reference in the element
-								$(this).data(classname,handler);
+								$(this).data(classname, handler);
 
 								// start the object's behavior
-								if(handler.start) {
+								if (handler.start) {
 									var element = this;
-									window.setTimeout(function() {
+									window.setTimeout(function () {
 										handler.start();
-										$('.DigitopiaInstance').trigger('DigitopiaNewInstance',element);
-									},0);
+										$('.DigitopiaInstance').trigger('DigitopiaNewInstance', element);
+									}, 0);
 								}
 
 							}
 						}
-						catch(err) {
+						catch (err) {
 							alert('Could not initialize element:' + this.id + ' jsclass:' + classname + ' error:' + err);
 						}
 					}
 				}
 			});
 
-			if(didInstantiate) {
-				$('.DigitopiaInstance').trigger('DigitopiaReady',this);
+			if (didInstantiate) {
+				$('.DigitopiaInstance').trigger('DigitopiaReady', this);
 			}
 
 		};
 
 		// listent for events
 
-		this.element.on('DigitopiaInstantiate', function(e) {
+		this.element.on('DigitopiaInstantiate', function (e) {
 			e.stopPropagation();
-			if(e.target === this) {
+			if (e.target === this) {
 				self.instantiateElements();
 				self.element.data('lazyInstantiate').watchScroll();
 			}
@@ -199,40 +202,40 @@ function GetJQueryPlugin(classname,obj) {
 
 	};
 
-	$.fn.digitopiaController = GetJQueryPlugin('digitopiaController',digitopiaController);
+	$.fn.digitopiaController = GetJQueryPlugin('digitopiaController', digitopiaController);
 })(jQuery);
 
-(function($) {
-	function lazyInstantiate (elem,options) {
+(function ($) {
+	function lazyInstantiate(elem, options) {
 		this.element = $(elem);
 		var self = this;
 
-		this.start = function() {
-			this.element.on('DigitopiaDidScroll',function(event) {
-				if(event.target === this) {
+		this.start = function () {
+			this.element.on('DigitopiaDidScroll', function (event) {
+				if (event.target === this) {
 					self.watchScroll();
 				}
 			});
 			self.watchScroll();
 		};
 
-		this.stop = function() {
+		this.stop = function () {
 			this.element.off('DigitopiaDidScroll');
 		};
 
-		this.watchScroll = function() {
-			$('.lazy-instantiate:in-viewport').each(function(){
-				if($(this).is(':visible')) {
+		this.watchScroll = function () {
+			$('.lazy-instantiate:in-viewport').each(function () {
+				if ($(this).is(':visible')) {
 					$(this).removeClass('lazy-instantiate');
 					var classes = $(this).data('lazy-jsclass').split(/,\s*/);
-					for(var i = 0; i < classes.length; i++) {
+					for (var i = 0; i < classes.length; i++) {
 						$(this)[classes[i]]();
 					};
 				}
 			});
 		};
 	}
-	$.fn.lazyInstantiate = GetJQueryPlugin('lazyInstantiate',lazyInstantiate);
+	$.fn.lazyInstantiate = GetJQueryPlugin('lazyInstantiate', lazyInstantiate);
 })(jQuery);
 ;// digitopia/geometry.js - digitopia.js geometry controller
 // status: api stable
