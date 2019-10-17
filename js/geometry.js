@@ -25,6 +25,9 @@ import {
 }
 from './controller';
 
+import Cookies from "js-cookie";
+
+
 var digitopiaGeometry = function (element, options) {
 	this.element = $(element);
 
@@ -201,7 +204,7 @@ var digitopiaGeometry = function (element, options) {
 	};
 
 	this.getCookie = function (key) {
-		return $.cookie(key);
+		return Cookies.get(key);
 	};
 
 	this.setCookie = function (key, value, expires) {
@@ -210,7 +213,7 @@ var digitopiaGeometry = function (element, options) {
 			domain: this.config.cookieDomain,
 			expires: expires
 		};
-		$.cookie(key, value, options);
+		Cookies.set(key, value, options);
 	};
 
 	this.deleteCookie = function (key) {
