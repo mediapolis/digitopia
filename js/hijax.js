@@ -183,10 +183,8 @@ var digitopiaHijax = function (element, options) {
 						self.mergeContent(html);
 					}
 				},
-				error: function (request, status, error) {
-					if (request.responseText) {
-						alert('could not load page.');
-					}
+				error: function (xhr, status, error) {
+					alert('could not load page. (' + error + ')');
 				}
 			});
 		}
