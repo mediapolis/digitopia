@@ -36,8 +36,6 @@ var digitopiaAjax = function (element, options) {
 		inline: $(this.element).data('inline'),
 		noLazy: $(this.element).data('no-lazy') ? $(this.element).data('no-lazy') : false,
 		showLoading: $(this.element).data('show-loading') ? $(this.element).data('show-loading') : false,
-		clientCache: $(this.element).data('client-cache') ? $(this.element).data('client-cache') : false,
-		clientCacheKey: $(this.element).data('cache-key') ? $(this.element).data('cache-key') : undefined,
 		args: $(this.element).data('args') ? JSON.parse($(this.element).data('args')) : {},
 	}, options || {});
 
@@ -74,26 +72,9 @@ var digitopiaAjax = function (element, options) {
 	this.ajaxLayer = function () {
 		if (!this.loaded) {
 			this.loaded = true;
-
-			var fromCache = undefined;
-
-			if (this.settings.clientCache) {
-				var clientCacheKey = this.id;
-				if (this.settings.clientCacheKey) {
-					clientCacheKey += '-' + this.settings.clientCacheKey;
-				}
-				fromCache = this.isCached(this.settings.clientCache, clientCacheKey);
-			}
-
-			if (fromCache) {
-				this.ready(fromCache);
-			}
-			else {
-				this.ajaxRequest();
-
-				if (this.settings.showLoading) {
-					$(this.element).addClass('responsive-loading');
-				}
+			this.ajaxRequest();
+			if (this.settings.showLoading) {
+				$(this.element).addClass('responsive-loading');
 			}
 		}
 	};
@@ -109,13 +90,6 @@ var digitopiaAjax = function (element, options) {
 			url: path + '?' + jQuery.param(this.settings.args),
 			dataType: this.settings.type,
 			success: function (result) {
-				if (self.settings.clientCache) {
-					var clientCacheKey = self.id;
-					if (self.settings.clientCacheKey) {
-						clientCacheKey += '-' + self.settings.clientCacheKey;
-					}
-					self.cacheIt(self.settings.clientCache, clientCacheKey, result);
-				}
 				self.ready(result);
 			},
 			error: function (request, status, error) {
@@ -138,39 +112,6 @@ var digitopiaAjax = function (element, options) {
 		this.element.trigger('data', response);
 	};
 
-	this.cacheIt = function (type, key, value) {
-		if (type === 'localStorage') {
-			if (Modernizr.localstorage) {
-				localStorage[key] = JSON.stringify(value);
-			}
-		}
-		else if (type === 'sessionStorage') {
-			if (Modernizr.sessionstorage) {
-				sessionStorage[key] = JSON.stringify(value);
-			}
-		}
-	}
-
-	this.isCached = function (type, key) {
-		var value;
-
-		if (type === 'localStorage') {
-			if (Modernizr.localstorage) {
-				value = localStorage[key];
-			}
-		}
-		else if (type === 'sessionStorage') {
-			if (Modernizr.sessionstorage) {
-				value = sessionStorage[key];
-			}
-		}
-
-		if (value != undefined) {
-			value = JSON.parse(value);
-		}
-
-		return value;
-	}
 };
 
 $.fn.digitopiaAjax = GetJQueryPlugin('digitopiaAjax', digitopiaAjax);

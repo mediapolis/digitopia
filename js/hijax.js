@@ -41,12 +41,6 @@ var digitopiaHijax = function (element, options) {
 		// process first page (normally only used for paged with content handlers)
 		processOriginalPath: false,
 
-		// use location hash scheme
-		locationHash: false,
-
-		// use html5 history scheme
-		popState: Modernizr.history,
-
 		// don't hijax links like mailto or script
 		excludeRegex: new RegExp('^(\/\/|http|javascript|mailto|#)'),
 
@@ -70,19 +64,11 @@ var digitopiaHijax = function (element, options) {
 	this.start = function () {
 		this.hijaxLinks(this.element);
 
-		if (this.settings.locationHash) {
-			$(window).bind('hashchange.hijax', function () {
-				self.watchLocationHash();
-			});
-			this.watchLocationHash();
-		}
+		$(window).bind('popstate.hijax', function (event) {
+			self.watchPopState(event);
+		});
+		self.watchPopState();
 
-		if (this.settings.popState) {
-			$(window).bind('popstate.hijax', function (event) {
-				self.watchPopState(event);
-			});
-			self.watchPopState();
-		}
 
 		$(this.element).on('DigitopiaReloadPage', function (e, href) {
 			e.stopPropagation();
@@ -95,22 +81,10 @@ var digitopiaHijax = function (element, options) {
 		$(this.element).on('DigitopiaLoadPage', function (e, href) {
 			e.stopPropagation();
 			if (e.target === this) {
-				if (!self.settings.popState && !self.settings.locationHash) {
-					document.location.href = href;
-				}
-				else {
-					if (href && !self.settings.excludeRegex.exec(href)) {
-						if (getPath(document.location) !== href) {
-							if (self.settings.locationHash) {
-								self.setLocationHash('hijax' + href);
-							}
-							else {
-								if (self.settings.popState) {
-									history.pushState(null, null, href);
-									self.watchPopState();
-								}
-							}
-						}
+				if (href && !self.settings.excludeRegex.exec(href)) {
+					if (getPath(document.location) !== href) {
+						history.pushState(null, null, href);
+						self.watchPopState();
 					}
 				}
 			}
@@ -119,9 +93,7 @@ var digitopiaHijax = function (element, options) {
 
 	this.stop = function () {
 		$('a').unbind('click.hijax');
-		if (this.settings.popState) {
-			$(window).unbind('popstate.hijax');
-		}
+		$(window).unbind('popstate.hijax');
 		$(this.element).off('DigitopiaLoadPage');
 		$(this.element).off('DigitopiaReloadPage');
 	};
@@ -171,13 +143,8 @@ var digitopiaHijax = function (element, options) {
 				success: function (html, status, xhr) {
 					if (xhr.getResponseHeader('x-digitopia-hijax-location')) {
 						var location = xhr.getResponseHeader('x-digitopia-hijax-location');
-						if (self.settings.popState) {
-							history.pushState(null, null, location);
-							self.watchPopState();
-						}
-						else {
-							document.location.href = location;
-						}
+						history.pushState(null, null, location);
+						self.watchPopState();
 					}
 					else {
 						self.mergeContent(html);
@@ -285,22 +252,6 @@ var digitopiaHijax = function (element, options) {
 		}
 	}
 
-	this.setLocationHash = function (params) {
-		location.hash = params;
-	}
-
-	this.watchLocationHash = function () {
-		if (location.hash != this.currentPath) {
-			var pathArray = location.hash.split('/');
-			if (pathArray[0] == '#hijax') {
-				var oldPath = this.currentPath;
-				pathArray.splice(0, 1);
-				this.currentPath = '/' + pathArray.join('/');
-				this.settings.nextScrollTop = this.settings.scrollTop;
-				this.hijaxLoad(this.currentPath, oldPath);
-			}
-		}
-	}
 };
 
 $.fn.digitopiaHijax = GetJQueryPlugin('digitopiaHijax', digitopiaHijax);

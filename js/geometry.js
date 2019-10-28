@@ -35,7 +35,6 @@ var digitopiaGeometry = function (element, options) {
 
 	this.orientation = undefined;
 	this.scale = undefined;
-	this.touch = Modernizr.touch;
 	this.disabled = false;
 	this.forceScale = undefined;
 

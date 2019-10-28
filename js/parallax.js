@@ -70,8 +70,6 @@ function parallaxWrapper(elem, options) {
 
 	this.currentScene = undefined;
 
-	this.disabled = Modernizr.touch;
-
 	this.lastScroll = {
 		top: -1,
 		left: -1
@@ -156,18 +154,12 @@ function parallaxWrapper(elem, options) {
 	};
 
 	this.watchScroll = function () {
-		if (Modernizr.touch) {
-			this.currentScroll = {
-				top: this.nextScroll.top,
-				left: this.nextScroll.left
-			}
+
+		this.currentScroll = {
+			top: $(window).scrollTop(),
+			left: $(window).scrollLeft()
 		}
-		else {
-			this.currentScroll = {
-				top: $(window).scrollTop(),
-				left: $(window).scrollLeft()
-			}
-		}
+
 
 		if (this.currentScroll.top != this.lastScroll.top || this.currentScroll.left != this.lastScroll.left) {
 			this.scrollMoved(this.currentScroll.left, this.currentScroll.top);
