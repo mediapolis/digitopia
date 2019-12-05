@@ -150,8 +150,10 @@ var digitopiaHijax = function (element, options) {
 						self.mergeContent(html);
 					}
 				},
-				error: function (xhr, status, error) {
-					alert('could not load page. (' + error + ')');
+				error: function (jqXHR, status, error) {
+					var flashLevel = jqXHR.getResponseHeader('x-digitopia-hijax-flash-level') ? jqXHR.getResponseHeader('x-digitopia-hijax-flash-level') : 'danger';
+					var flashMessage = jqXHR.getResponseHeader('x-digitopia-hijax-flash-message') ? jqXHR.getResponseHeader('x-digitopia-hijax-flash-message') : error;
+					flashAjaxStatus(flashLevel, flashMessage);
 				}
 			});
 		}
