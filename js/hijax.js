@@ -25,6 +25,11 @@ import {
 }
 from './controller';
 
+import {
+	flashAjaxStatus
+}
+from '../../digitopia-cms/assets/modules/utils'
+
 function getPath(location) {
 	var path = location.pathname + location.search;
 	return path;
