@@ -158,6 +158,9 @@ var digitopiaHijax = function (element, options) {
 				error: function (jqXHR, status, error) {
 					var flashLevel = jqXHR.getResponseHeader('x-digitopia-hijax-flash-level') ? jqXHR.getResponseHeader('x-digitopia-hijax-flash-level') : 'danger';
 					var flashMessage = jqXHR.getResponseHeader('x-digitopia-hijax-flash-message') ? jqXHR.getResponseHeader('x-digitopia-hijax-flash-message') : error;
+					if (!flashMessage) {
+						flashMessage = 'Could not connect to server.';
+					}
 					flashAjaxStatus(flashLevel, flashMessage);
 				}
 			});
