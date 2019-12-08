@@ -87,7 +87,7 @@ var digitopiaAjax = function (element, options) {
 
 		$.ajax({
 			type: 'GET',
-			url: path + '?' + jQuery.param(this.settings.args),
+			url: path + '?' + $.param(this.settings.args),
 			dataType: this.settings.type,
 			success: function (result) {
 				self.ready(result);
